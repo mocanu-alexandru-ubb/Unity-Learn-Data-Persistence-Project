@@ -6,22 +6,28 @@ using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
+
+    public string PlayerName;
     public Brick BrickPrefab;
     public int LineCount = 6;
-    public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
-    
+    public Rigidbody Ball;
+
+    private int m_Points = 0;
     private bool m_Started = false;
-    private int m_Points;
-    
+
     private bool m_GameOver = false;
 
-    
     // Start is called before the first frame update
     void Start()
     {
+        BestScoreText.text = "Best score: " 
+            + PersistanceManager.Instance.PersistentData.Name + " - " 
+            + PersistanceManager.Instance.PersistentData.Score;
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -45,7 +51,7 @@ public class MainManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 m_Started = true;
-                float randomDirection = Random.Range(-1.0f, 1.0f);
+                float randomDirection = UnityEngine.Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
                 forceDir.Normalize();
 
@@ -57,6 +63,9 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                m_GameOver = false;
+                GameOverText.SetActive(false);
+                m_Points = 0;
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
@@ -71,6 +80,7 @@ public class MainManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
+        PersistanceManager.Instance.GameOver(m_Points, PlayerName);
         GameOverText.SetActive(true);
     }
 }
